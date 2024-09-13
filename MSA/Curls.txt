@@ -1,0 +1,18 @@
+dotnet new webapi -o Glossary
+
+dotnet run
+
+http://localhost:5045
+
+curl --insecure http://localhost:5045/weatherforecast
+
+http://localhost:5045/
+curl --insecure http://localhost:5045/api/glossary/MVC
+
+
+curl --insecure -X POST -d "{\"term\": \"MFA\", \"definition\":\"An authentication process.\"}" -H "Content-Type:application/json" http://localhost:5045/api/glossary
+
+
+curl --insecure -X PUT -d "{\"term\": \"MVC\", \"definition\":\"Modified record of Model View Controller.\"}" -H "Content-Type:application/json" http://localhost:5045/api/glossary
+
+curl --insecure --request DELETE --url https://localhost:5001/api/glossary/openid
