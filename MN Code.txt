@@ -1,0 +1,311 @@
+R1(ISP) 
+Router>enable 
+Router#conf t 
+Router(config)#hostname ISP 
+ISP(config)#interface Loopback0 
+ISP(config-if)#ip address 192.168.100.1 255.255.255.0
+ ISP(config-if)#exit
+ ISP(config)#interface Serial1/0 
+ISP(config-if)#ip address 192.168.1.5 255.255.255.252
+ ISP(config-if)#no shutdown 
+ISP(config-if)#exit 
+ISP(config)#interface Serial1/1 
+ISP(config-if)#ip address 192.168.1.1 255.255.255.252 
+ISP(config-if)#no shutdown
+ ISP(config-if)#exit 
+ISP(config)#router bgp 200
+ ISP(config-router)#network 192.168.100.0 
+ISP(config-router)#neighbor 192.168.1.6 remote-as 64512 
+ISP(config-router)#neighbor 192.168.1.2 remote-as 64512
+ ISP(config-router)#exit 
+ISP#sh ip bgp
+ BGP table version is 3, local router ID is 192.168.100.1 
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, 
+Origin codes: i - IGP, e - EGP, ? – incomplete
+ RPKI validation codes: V valid, I invalid, N Not found
+ Network                                       Next Hop                   Metric                                LocPrf Weight Path
+ * 172.16.0.0                               192.168.1.2                     0                                               0 64512 i
+ *> 192.168.1.6                              0                                     0                                               64512 i
+ *> 192.168.100.0                          0.0.0.0                           0                                               32768 i
+ ISP#ping 172.16.1.1 source 192.168.100.1 
+Type escape sequence to abort. 
+Sending 5, 100-byte ICMP Echos to 172.16.1.1, timeout is 2 seconds: 
+Packet sent with a source address of 192.168.100.1 !!!!! 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 10/10/11 ms 
+ISP#ping 172.16.32.1 source 192.168.100.1 
+Type escape sequence to abort. 
+Sending 5, 100-byte ICMP Echos to 172.16.32.1, timeout is 2 seconds:
+ Packet sent with a source address of 192.168.100.1 !!!!! 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 15/15/16 ms
+ ISP#ping 172.16.1.2 source 192.
+168.100.1 
+Type escape sequence to abort.
+ Sending 5, 100-byte ICMP Echos to 172.16.1.2, timeout is 2 seconds: 
+Packet sent with a source address of 192.168.100.1 !!!!!
+ Success rate is 100 percent (5/5), round-trip min/avg/max = 15/17/25 ms 
+ISP(config)#router bgp 200 
+ISP(config-router)#network 192.168.1.0 mask 255.255.255.252 
+ISP(config-router)#network 192.168.1.4 mask 255.255.255.252 
+ISP(config-router)#exit 
+ISP#sh ip bgp
+ BGP table version is 5, local router ID is 192.168.100.1 
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed,
+ Origin codes: i - IGP, e - EGP, ? – incomplete
+ RPKI validation codes: V valid, I invalid, N Not found
+ Network                                            Next Hop                         Metric                              LocPrf Weight Path * 172.16.0.0                                    192.168.1.6                            0                                        0 64512 i
+ *> 192.168.1.2                                     0                                        0                                         64512 
+i *> 192.168.1.0/30                          0.0.0.0                                  0                                           32768 i 
+*> 192.168.1.4/30                             0.0.0.0                                 0                                          32768 i 
+*> 192.168.100.0                                0.0.0.0                               0                                             32768 i
+ ISP#sh ip bgp 
+BGP table version is 6, local router ID is 192.168.100.1 
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed,
+ Origin codes: i - IGP, e - EGP, ? - incomplete 
+RPKI validation codes: V valid, I invalid, N Not found 
+Network                                       Next Hop                                       Metric                        LocPrf Weight Path *> 172.16.0.0                            192.168.1.6                                        50                                         0 64512 i
+ * 192.168.1.2                              75                                                     0                                                 64512 i 
+*> 192.168.1.0/30                  0.0.0.0                                                 0                                                32768 i
+ *> 192.168.1.4/30                   0.0.0.0                                               0                                                   32768 i
+ *> 192.168.100.0                      0.0.0.0                                                0                                                32768 i 
+ISP#ping 172.16.1.1 
+Type escape sequence to abort. 
+Sending 5, 100-byte ICMP Echos to 172.16.1.1, timeout is 2 seconds: !!!!! 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 9/10/11 ms 
+ISP#ping 172.16.1.2 
+Type escape sequence to abort. 
+Sending 5, 100-byte ICMP Echos to 172.16.1.2, timeout is 2 seconds: !!!!! 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 20/21/25 ms
+ ISP#traceroute 172.16.1.1
+ Type escape sequence to abort.
+ Tracing the route to 172.16.1.1 
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 192.168.1.6 10 msec 10 msec *
+ ISP#traceroute 172.16.1.2 
+Type escape sequence to abort. 
+Tracing the route to 172.16.1.2 
+VRF info: (vrf in name/id, vrf out name/id)
+ 1 192.168.1.6 10 msec 10 msec 13 msec
+ 2 172.16.1.2 [AS 64512] 20 msec 19 msec 
+
+
+* R2 (SanJose1)
+ Router>enable Router#conf t 
+Router(config)#hostname SanJose1
+ SanJose1(config)#interface Loopback0
+ SanJose1(config-if)#ip address 172.16.64.1 255.255.255.0 
+SanJose1(config-if)#ip address 172.16.64.1 255.255.255.0
+ SanJose1(config-if)#exit 
+SanJose1(config)#interface Serial1/0
+ SanJose1(config-if)#ip address 192.168.1.6 255.255.255.252 
+SanJose1(config-if)#no shutdown 
+SanJose1(config-if)#exit
+ SanJose1(config)#interface Serial1/1
+ SanJose1(config-if)#ip address 172.16.1.1 255.255.255.0 
+SanJose1(config-if)#no shutdown 
+SanJose1(config-if)#exit 
+SanJose1(config)#router eigrp 64512 
+SanJose1(config-router)#network 172.16.0.0 
+SanJose1(config-router)#no auto-summary 
+SanJose1(config-router)#exit 
+SanJose1(config)#router bgp 64512
+ SanJose1(config-router)#neighbor 172.16.32.1 remote-as 64512
+ SanJose1(config-router)#neighbor 172.16.32.1 update-source loopback0
+ SanJose1(config-router)#exit 
+SanJose1(config)#ip route 172.16.0.0 255.255.0.0 null 0 
+SanJose1(config)#router bgp 64512 
+SanJose1(config-router)#network 172.16.0.0
+ SanJose1(config-router)#neighbor 192.168.1.5 remote-as 200 S
+anJose1(config-router)#exit 
+SanJose1(config)#router bgp 64512
+ SanJose1(config-router)#neig
+hbor 172.16.32.1 next-hop-self
+ SanJose1(config-router)#exit 
+SanJose1#sh ip bgp
+ BGP table version is 5, local router ID is 172.16.64.1
+ Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? - incomplete 
+RPKI validation codes: V valid, I invalid, N Not found 
+Network                                 Next Hop                              Metric                                     LocPrf Weight Path * i 172.16.0.0                      172.16.32.1                             0                                               100 0 i
+ *> 0.0.0.0                                  0                                        32768 i 
+* i 192.168.1.0/30 172.16.32.1          0                              100                                             0 200 i
+ *> 192.168.1.5 0 0 200 i r i 192.168.1.4/30 172.16.32.1 0 100  0                                200 i 
+   r> 192.168.1.5 0 0 200 i
+ * i 192.168.100.0 172.16.32.1           0                             100                                                0 200 i 
+*> 192.168.1.5                          0                                            0                                                  200 i 
+SanJose1(config)#route-map PRIMARY_T1_IN permit 10 
+SanJose1(config-route-map)#set local-preference 160
+ SanJose1(config-route-map)#exit 
+SanJose1(config)#router bgp 64512 
+SanJose1(config-router)#neighbor 192.168.1.5 route-map PRIMARY_T1_IN in
+ SanJose1(config-router)#exit
+ SanJose1#clear ip bgp * soft
+ SanJose1#sh ip bgp
+ BGP table version is 8, local router ID is 172.16.64.1 
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? - incomplete 
+RPKI validation codes: V valid, I invalid, N Not found
+ Network                                     Next Hop                                    Metric                            LocPrf Weight Path * i 172.16.0.0                                 172.16.32.1                              0                                           100 0 i 
+*> 0.0.0.0                                            0                                                                                         32768 
+i *> 192.168.1.0/30                    192.168.1.5                                       0                                  160 0 200 i 
+r> 192.168.1.4/30 192.168.1.5        0                                             160                                           0 200 i
+ *> 192.168.100.0                              192.168.1.5                                   0                                  160 0 200 i 
+
+ SanJose1(config)#route-map PRIMARY_T1_MED_OUT permit 10 
+SanJose1(config-route-map)#set Metric 50 
+SanJose1(config-route-map)#exit 
+SanJose1(config)#router bgp 64512 
+SanJose1(config-router)#neighbor 192.168.1.5 route-map PRIMARY_T1_MED_OUT out SanJose1(config-router)#exit 
+SanJose1(config)#exit
+SanJose1#clear ip bgp * soft 
+SanJose1#sh ip bgp 
+BGP table version is 8, local router ID is 172.16.64.1
+ Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? – incomplete
+ RPKI validation codes: V valid, I invalid, N Not found
+ Network                                    Next Hop                         Metric                                       LocPrf Weight Path * i 172.16.0.0                             172.16.32.1                     0                                                         100 0 i
+ *> 0.0.0.0                                        0                                                                                                         32768 i
+ *> 192.168.1.0/30                        192.168.1.5                         0                                                   160 0 200 i 
+r> 192.168.1.4/30                                192.168.1.5                0                                                     160 0 200 i
+ *> 192.168.100.0                             192.168.1.5                  0                                                           160 0 200 i
+ SanJose1#sh ip route 
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2 E1 - OSPF external type 1, E2 - OSPF external type 2 i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2 ia - IS-IS inter area, * - candidate default, U - per-user static route o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP a - application route + - replicated route, % - next hop override 
+Gateway of last resort is not set
+ 172.16.0.0/16 is variably subnetted, 6 subnets, 3 masks
+ S 172.16.0.0/16 is directly connected, Null0 
+C 172.16.1.0/24 is directly connected, Serial1/1
+ L 172.16.1.1/32 is directly connected, Serial1/1 
+D 172.16.32.0/24 [90/2297856] via 172.16.1.2, 01:28:25, Serial1/1
+ C 172.16.64.0/24 is directly connected, Loopback0
+ L 172.16.64.1/32 is directly connected, Loopback0 192.168.1.0/24 is variably subnetted, 3 subnets, 2 masks
+ B 192.168.1.0/30 [20/0] via 192.168.1.5, 00:45:28
+C 192.168.1.4/30 is directly connected, Serial1/0 
+L 192.168.1.6/32 is directly connected, Serial1/0 
+B 192.168.100.0/24 [20/0] via 192.168.1.5, 00:45:28
+ After issuing ip default-network 
+SanJose1(config)#ip default-network 192.168.100.0 
+SanJose1(config)#end SanJose1#sh ip route
+ Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2 E1 - OSPF external type 1, E2 - OSPF external type 2 i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2 ia - IS-IS inter area, * - candidate default, U - per-user static route o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP a - application route + - replicated route, % - next hop override
+ Gateway of last resort is 192.168.1.5 to network 192.168.100.0
+ S* 0.0.0.0/0 [20/0] via 192.168.1.5 172.16.0.0/16 is variably subnetted, 6 subnets, 3 masks
+ S 172.16.0.0/16 is directly connected, Null0 
+C 172.16.1.0/24 is directly connected, Serial1/1 
+L 172.16.1.1/32 is directly connected, Serial1/1
+ D 172.16.32.0/24 [90/2297856] via 172.16.1.2, 01:33:38, Serial1/1
+ C 172.16.64.0/24 is directly connected, Loopback0
+ L 172.16.64.1/32 is directly connected, Loopback0 192.168.1.0/24 is variably subnetted, 3 subnets, 2 masks 
+B 192.168.1.0/30 [20/0] via 192.168.1.5, 00:50:41 
+C 192.168.1.4/30 is directly connected, Serial1/0
+ L 192.168.1.6/32 is directly connected, Serial1/0
+ B* 192.168.100.0/24 [20/0] via 192.168.1.5, 00:50:41 
+SanJose1#ping 192.168.1.2 
+Type escape sequence to abort.
+ Sending 5, 100-byte ICMP Echos to 192.168.1.2, timeout is 2 seconds: !!!!! 
+Success rate is 100 percent (5/5), round-trip min/avg/max = 14/15/16 ms 
+SanJose1#traceroute 192.168.1.2 
+Type escape sequence to abort. 
+Tracing the route to 192.168.1.2 
+VRF info: (vrf in name/id, vrf out name/id) 1 192.168.1.5 [AS 200] 10 msec 10 msec 10 msec 2 192.168.1.2 [AS 200] 15 msec 15 msec *
+ SanJose1#ping 192.168.1.1 
+Type escape sequence to abort.
+ Sending 5, 100-byte ICMP Echos to 192.168.1.1, timeout is 2 seconds: !!!!!
+ Success rate is 100 percent (5/5), round-trip min/avg/max = 9/9/11 ms 
+SanJose1#traceroute 192.168.1.1 
+Type escape sequence to abort.
+ Tracing the route to 192.168.1.1
+ VRF info: (vrf in name/id, vrf out name/id
+ 1 192.168.1.5 [AS 200] 10 msec 11 msec * 
+
+
+
+R3 (SanJose2) 
+Router>en 
+Router#conf t 
+Router(config)#hostname SanJose2 
+SanJose2(config)#interface Loopback0
+ SanJose2(config-if)#ip address 172.16.32.1 255.255.255.0
+ SanJose2(config-if)#exit 
+SanJose2(config)#interface Serial1/1
+ SanJose2(config-if)#ip address 192.168.1.2 255.255.255.252 
+SanJose2(config-if)#no shutdown
+ SanJose2(config-if)#exit 
+SanJose2(config)#interface Serial1/0 
+SanJose2(config-if)#ip address 172.16.1.2 255.255.255.0 
+SanJose2(config-if)#no shutdown 
+SanJose2(config-if)#exit 
+SanJose2(config)#router eigrp 64512
+ SanJose2(config-router)#network 172.16.0.0
+ SanJose2(config-router)#no auto-summary 
+SanJose2(config-router)#exit 
+SanJose2(config)#router bgp 64512
+ SanJose2(config-router)#neighbor 172.16.64.1 remote-as 64512 
+SanJose2(config-router)#neighbor 172.16.64.1 update-source loopback0
+ SanJose2(config-router)#exit
+ SanJose2(config)#ip route 172.16.0.0 255.255.0.0 null 0
+ SanJose2(config)#router bgp 64512 
+SanJose2(config-router)#network 172.16.0.0
+ SanJose2(config-router)#neighbor 192.168.1.1 remote-as 200 
+SanJose2(config-router)#exit 
+SanJose2#sh ip bgp summary 
+BGP router identifier 172.16.32.1, local AS number 64512 
+BGP table version is 4, main routing table version 4 
+2 network entries using 280 bytes of memory
+ 4 path entries using 320 bytes of memory 4/2 BGP path/bestpath attribute entries using 576 bytes of memory
+ 1 BGP AS-PATH entries using 24 bytes of memory 
+0 BGP route-map cache entries using 0 bytes of memory 0 
+BGP filter-list cache entries using 0 bytes of memory 
+BGP using 1200 total bytes of memory 
+BGP activity 2/0 prefixes, 4/0 paths, scan interval 60 secs Neighbor V AS MsgRcvd MsgSent TblVer InQ OutQ Up/Down State/PfxRcd 172.16.64.1 4 64512 31 32 4 0 0 00:24:41 2 192.168.1.1 4 200 8 6 4 0 0 00:01:22 1 
+SanJose2#sh ip route
+ Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP D - EIGRP, EX - EIGRP external, O - OSPF, IA - OSPF inter area N1 - OSPF NSSA external type 1, N2 - OSPF NSSA external type 2 E1 - OSPF external type 1, E2 - OSPF external type 2 i - IS-IS, su - IS-IS summary, L1 - IS-IS level-1, L2 - IS-IS level-2 ia - IS-IS inter area, * - candidate default, U - per-user static route o - ODR, P - periodic downloaded static route, H - NHRP, l - LISP a - application route + - replicated route, % - next hop override
+ Gateway of last resort is not set
+ 172.16.0.0/16 is variably subnetted, 6 subnets, 3 masks 
+S 172.16.0.0/16 is directly connected, Null0 
+C 172.16.1.0/24 is directly connected, Serial1/0 L 172.16.1.2/32 is directly connected, Serial1/0 C 172.16.32.0/24 is directly connected, Loopback0 
+L 172.16.32.1/32 is directly connected, Loopback0 
+D 172.16.64.0/24 [90/2297856] via 172.16.1.1, 00:08:46, Serial1/0 192.168.1.0/24 is variably subnetted, 3 subnets, 2 mask
+s C 192.168.1.0/30 is directly connected, Serial1/1 
+L 192.168.1.2/32 is directly connected, Serial1/1
+ B 192.168.1.4/30 [20/0] via 192.168.1.1, 00:02:19 
+B 192.168.100.0/24 [20/0] via 192.168.1.1, 00:07:40 
+SanJose2#sh ip bgp 
+BGP table version is 5, local router ID is 172.16.32.1 
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? - incomplete 
+RPKI validation codes: V valid, I invalid, N Not found
+ Network                                       Next Hop                      Metric                                        LocPrf Weight Path * i 172.16.0.0                           172.16.64.1                          0                                                          100 0 i
+ *> 0.0.0.0 0 32768 i r i 192.168.1.0/30  192.168.1.5       0                                                      100 0 200 i 
+r> 192.168.1.1 0 0 200 i 
+* i 192.168.1.4/30                                 192.168.1.5          0                                                       100 0 200 i 
+*> 192.168.1.1                                              0                      0                                                                   200 i
+ * i 192.168.100.0 192.168.1.5                      0                  100                                                              0 200 i 
+*> 192.168.1.1                                                  0               0                                                                  200 i SanJose2(config)#router bgp 64512
+ SanJose2(config-router)#neighbor 172.16.64.1 next-hop-self 
+SanJose2(config-router)#exi
+t SanJose2#sh ip bgp 
+BGP table version is 5, local router ID is 172.16.32.1 
+Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? - incomplete 
+RPKI validation codes: V valid, I invalid, N Not found Network Next Hop Metric LocPrf Weight Path * i 172.16.0.0 172.16.64.1 0 100 0 i *> 0.0.0.0 0 32768 i r i 192.168.1.0/30 172.16.64.1 0 100 0 200 i r> 192.168.1.1 0 0 200 i * i 192.168.1.4/30 172.16.64.1 0 100 0 200 i *> 192.168.1.1 0 0 200 i * i 192.168.100.0 172.16.64.1 0 100 0 200 i *> 192.168.1.1 0 0 200 i
+ SanJose2(config)#route-map SECONDARY_T1_IN permit 10 
+SanJose2(config-route-map)#set local-preference 125
+ SanJose2(config-route-map)#exi
+t SanJose2(config)#router bgp 64512
+ SanJose2(config-router)#neighbor 192.168.1.1 route-map SECONDARY_T1_IN in
+ SanJose2(config-router)#exit 
+SanJose2#clear ip bgp * soft 
+SanJose2#sh ip bgp 
+BGP table version is 8, local router ID is 172.16.32.1 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? – incomplete
+ RPKI validation codes: V valid, I invalid, N Not found Network Next Hop Metric LocPrf Weight Path * i 172.16.0.0 172.16.64.1 0 100 0 i *> 0.0.0.0 0 32768 i r>i 192.168.1.0/30 172.16.64.1 0 160 0 200 i r 192.168.1.1 0 125 0 200 i *>i 192.168.1.4/30 172.16.64.1 0 160 0 200 i * 192.168.1.1 0 125 0 200 i *>i 192.168.100.0 172.16.64.1 0 160 0 200 i * 192.168.1.1 0 125 0 200 i 
+SanJose2(config)#route-map SECONDARY_T1_MED_OUT permit 10 
+SanJose2(config-route-map)#set Metric 75
+ SanJose2(config-route-map)#exit 
+SanJose2(config)#router bgp 64512
+ SanJose2(config-router)#$2.168.1.1 route-map SECONDARY_T1_MED_OUT out
+ SanJose2(config-router)#end 
+SanJose2#clear ip bgp * soft
+ SanJose2#sh ip bgp 
+BGP table version is 8, local router ID is 172.16.32.1 Status codes: s suppressed, d damped, h history, * valid, > best, i - internal, r RIB-failure, S Stale, m multipath, b backup-path, f RT-Filter, x best-external, a additional-path, c RIB-compressed, Origin codes: i - IGP, e - EGP, ? – incomplete
+ RPKI validation codes: V valid, I invalid, N Not found
+ Network                                            Next Hop                                  Metric                     LocPrf Weight Path * i 172.16.0.0                                        172.16.64.1                               0                                    100 0 i 
+*> 0.0.0.0                                                  0                                                                                     32768 i 
+r>i 192.168.1.0/30                                 172.16.64.1                           0                                      160 0 200 i 
+r 192.168.1.1 0                                       125                                            0                                       200 i 
+*>i 192.168.1.4/30                           172.16.64.1                             0 160 0                                      200 i 
+* 192.168.1.1 0                                          125                                           0                                        200 i
+ *>i 192.168.100.0 172.16.64.1                  0                                    160                                          0 200 i
+ * 192.168.1.1                                                  0                                  125                                            0 200 i 
