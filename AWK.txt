@@ -1,0 +1,38 @@
+
+diff -w prog.c.bak prog.c
+
+ESc:wq
+
+root@Zaira:~# echo $SHELL
+/bin/bash
+
+vi SampleText.txt
+
+$ echo "foo"
+foo
+$ echo "bar"
+bar
+$ history
+ 1 echo "foo"
+ 2 echo "bar"
+3 history
+
+
+root@Zaira:~# printenv SHELL
+/bin/bash
+
+root@Zaira:~# echo $SHELL
+/bin/bash
+
+
+
+awk '{action}' filename
+awk '{pattern; action}' filename
+
+awk '{print $1}' filename
+
+
+
+$ awk '{print $1}'  awk.txt
+
+$cat  awk.txt
